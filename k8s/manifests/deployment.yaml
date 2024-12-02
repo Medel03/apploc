@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: location-app-deployment
+  labels:
+    app: location-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: location-app
+  template:
+    metadata:
+      labels:
+        app: location-app
+    spec:
+      containers:
+      - name: location-app
+        image: med3301/location-app:latest
+        ports:
+        - containerPort: 8081
