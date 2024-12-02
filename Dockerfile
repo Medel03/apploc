@@ -5,7 +5,7 @@ RUN mvn clean install
 
 
 
-FROM eclipse-temurin:21.0.2_13-jdk
+FROM eclipse-temurin:17.0.13_11-jdk
 WORKDIR /app
 COPY --from=build /app/target/location-app-1.0-SNAPSHOT.jar /app/
 EXPOSE 8081
