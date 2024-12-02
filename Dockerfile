@@ -7,7 +7,7 @@ RUN mvn clean install
 
 FROM eclipse-temurin:21.0.2_13-jdk
 WORKDIR /app
-COPY --from=build /app/WEBModule/target/WEBModule-0.0.1-SNAPSHOT.jar /app/
+COPY --from=build /app/target/location-app-1.0-SNAPSHOT.jar /app/
 EXPOSE 8081
-CMD ["java", "-jar","WEBModule-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar","location-app-1.0-SNAPSHOT.jar"]
 
