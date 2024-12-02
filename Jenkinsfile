@@ -8,7 +8,7 @@ pipeline {
     }
 
     environment {
-        APP_NAME = "gcsp"
+        APP_NAME = "location-app"
         RELEASE = "1.0.0"
         DOCKER_USER = "med3301"
         DOCKER_PASS = "dockerhub-pass"
@@ -26,7 +26,7 @@ pipeline {
 
         stage("Checkout from SCM") {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Medel03/cbapp'
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Medel03/apploc'
             }
         }
         
