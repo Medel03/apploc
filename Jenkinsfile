@@ -92,7 +92,9 @@ pipeline {
             steps {
                 script {
                     // Update the Docker image tag in the Helm chart's values.yaml file
-                    sed -i "s/tag: .*/tag: \"${IMAGE_TAG}\"/" ${HELM_VALUES_FILE}
+                    sh """
+		    sed -i 's/tag: .*/tag: "${IMAGE_TAG}"/' ${HELM_VALUES_FILE}
+		    """
                 }
             }
         }
