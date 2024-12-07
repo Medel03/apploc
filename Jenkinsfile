@@ -1,11 +1,11 @@
 pipeline {
-    agent {
+    agent any /*{
         docker {
             image 'med3301/jenkins-agent:2.3'
             args '--user root -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/jenkins/workspace:/var/lib/jenkins/workspace'
             
         } 
-    }
+    }*/
 
     environment {
         APP_NAME = "location-app"
