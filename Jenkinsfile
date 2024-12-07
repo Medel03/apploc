@@ -27,7 +27,7 @@ pipeline {
 
         stage("Checkout from SCM") {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Medel03/apploc'
+                git branch: 'main', credentialsId: 'github', url: 'git@github.com:Medel03/apploc.git'
             }
         }
         
