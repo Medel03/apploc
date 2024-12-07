@@ -102,14 +102,17 @@ pipeline {
         stage('Commit and Push Changes') {
             steps {
                 script {
-                    // Commit the changes to values.yaml and push to the Git repository
-                    sh """
-                    git config --global user.email "med.elh3301@gmail.com"
-		    git config --global user.name "Med EL HARCH"
-                    git add ${HELM_VALUES_FILE}
-                    git commit -m "Update tag in Helm chart to ${IMAGE_TAG}"
-                    git push origin HEAD:main
-                    """
+		     withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                    		// Commit the changes to values.yaml and push to the Git repository
+                    	sh """
+                    	git config --global user.email "med.elh3301@gmail.com"
+		    	git config --global user.name "Med EL HARCH"
+                    	git add ${HELM_VALUES_FILE}
+                    	git commit -m "Update tag in Helm chart to ${IMAGE_TAG}"
+		    	git remote set-url origin https://$GITHUB_TOKEN@github.com/Medel03/apploc.git
+                    	git push origin HEAD:main
+                    	"""
+		     }
                 }
             }
         }
