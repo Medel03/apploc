@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: location-app
-        image: med3301/location-app:latest
+        image: med3301/location-app:{{ .Values.image.tag }}
         ports:
         - containerPort: 8081
