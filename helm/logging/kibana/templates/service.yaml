@@ -3,8 +3,7 @@ kind: Service
 metadata:
   name: kibana  # Custom name for Kibana's service
   namespace: {{ .Values.namespace }}  # Ensure it matches Elasticsearch's namespace
-  annotations:
-    cloud.google.com/load-balancer-type: "Internal"  # Optionally, for internal load balancing within GCP (if needed)
+  annotations: {}  # No internal load balancer; it will be externally accessible
 spec:
   ports:
     - name: "5601"  # Kibana's web interface port
