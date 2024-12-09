@@ -1,0 +1,70 @@
+# Number of replicas for Kibana
+replicaCount: 1  # Adjust as needed
+
+# Kibana image configuration (use the same version as Elasticsearch)
+image:
+  repository: "docker.elastic.co/kibana/kibana"
+  pullPolicy: IfNotPresent
+  tag: "7.16.2"  # Ensure this matches Elasticsearch version
+
+# Custom application name and namespace to match Elasticsearch
+appName: kibana 
+namespace: logging  # Ensure it matches Elasticsearch's namespace
+
+imagePullSecrets: []  # Add image pull secrets if required for private registries
+
+# Elasticsearch service name configuration (for Kibana to connect to Elasticsearch)
+# Make sure the service name is correct for your Elasticsearch instance
+elasticsearchHosts: "http://elasticsearch:9200"  # Assuming 'elasticsearch' is the service name in the 'logging' namespace
+
+# Persistence settings (optional for Kibana)
+persistence:
+  enabled: false  # Kibana typically doesn't need persistence unless needed for caching
+
+# Resource limits and requests (aligned with Elasticsearch's resource settings)
+resources:
+  limits:
+    cpu: "1"
+    memory: "2Gi"
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+
+# Liveness and readiness probes (based on Elasticsearch)
+livenessProbe:
+  httpGet:
+    path: /api/status  # Kibana's status check URL
+    port: 5601
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /api/status  # Same endpoint for readiness
+    port: 5601
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+# Autoscaling configuration (optional for Kibana)
+autoscaling:
+  enabled: false  # Adjust this if you need auto-scaling for Kibana
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80  # Set a scaling threshold based on CPU usage
+
+# Ingress configuration for external access (optional)
+ingress:
+  enabled: false  # Use ClusterIP unless external access is needed
+  annotations: {}
+  hosts:
+    - host: kibana.local  # Change to your external hostname if ingress is enabled
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []  # Use TLS if needed
+
+
+
+
+
+

@@ -1,0 +1,62 @@
+replicaCount: 1
+
+image:
+  repository: "docker.elastic.co/elasticsearch/elasticsearch"
+  pullPolicy: IfNotPresent
+  tag: "7.16.2"
+
+# Custom application name
+appName: elasticsearch
+namespace: logging
+
+imagePullSecrets: []
+
+# Elasticsearch Storage Configuration (Persistent Volume)
+persistence:
+  enabled: true
+  storageClass: "standard"  # Modify this if you have a specific storage class in GKE
+  size: 30Gi  # Adjust based on your Elasticsearch data needs
+
+# Service configuration
+service:
+  type: ClusterIP  # Use ClusterIP for internal access
+  port: 9200
+  targetPort: 9200
+
+ingress:
+  enabled: false  # Disable ingress unless you want to configure it separately
+
+# Resource limits and requests (adjust as needed for your GKE)
+resources:
+  limits:
+    cpu: "1"
+    memory: "2Gi"
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+
+# Liveness and readiness probes
+livenessProbe:
+  httpGet:
+    path: /_cluster/health
+    port: 9200
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /_cluster/health
+    port: 9200
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+# Autoscaling (optional)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+
+
+
+

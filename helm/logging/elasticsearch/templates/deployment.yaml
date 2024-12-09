@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+        - name: elasticsearch
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          env:
+            - name: discovery.type
+              value: single-node
+          readinessProbe:
+            exec:
+              command:
+              - curl
+              - localhost:9200/_cluster/health
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+              - curl
+              - localhost:9200/_cluster/health
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          ports:
+            - containerPort: 9200
+            - containerPort: 9300
+
