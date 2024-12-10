@@ -12,8 +12,8 @@ data:
         - type: kubernetes
           templates:
             - condition:
-                equals: 
-                  kubernetes.namespace: {{ .Values.appNamespace }}  # App namespace (e.g., default)
+                equals:
+                  kubernetes.namespace: {{ .Values.appNamespace }}  # App namespace (e.g., logging)
               config:
                 - type: container
                   paths:
@@ -27,5 +27,6 @@ data:
       host: {{ .Values.kibanaService }}  # Kibana service (use correct service name in values.yaml)
     output.elasticsearch:
       hosts: [{{ .Values.esService }}]  # Elasticsearch service (use correct service name in values.yaml)
+
 
 

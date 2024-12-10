@@ -20,31 +20,6 @@ serviceAccount:
   create: true
   name: "filebeat-serviceaccount"  # Name of the ServiceAccount for Filebeat
 
-# ConfigMap containing filebeat.yml settings
-config:
-  filebeat.yml: |
-    filebeat.autodiscover:
-      providers:
-        - type: kubernetes
-          templates:
-            - condition:
-                equals:
-                  kubernetes.namespace: logging  # Update this if using different namespace
-              config:
-                - module: nginx
-                  access.input:
-                      type: docker
-                      containers.ids:
-                      - "${data.kubernetes.container.id}"
-                      paths:
-                        - /var/log/containers/*${data.kubernetes.container.id}.log
-
-    setup.dashboards.enabled: true
-    setup.kibana:
-      host: "http://{{ .Values.kibanaService }}"  # Connect to Kibana using internal service name
-    output.elasticsearch:
-      hosts: [ "{{ .Values.esService }}" ]  # Send logs to Elasticsearch service
-
 # DaemonSet settings to deploy Filebeat across all nodes
 daemonset:
   enabled: true
@@ -71,3 +46,28 @@ persistence:
 serviceAccount:
   create: true
   name: "filebeat"  # Filebeat ServiceAccount
+
+# Filebeat configuration to be embedded in configmap
+config:
+  filebeat.yml: |
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          templates:
+            - condition:
+                equals:
+                  kubernetes.namespace: {{ .Values.appNamespace }}  # App namespace (e.g., logging)
+              config:
+                - type: container
+                  paths:
+                    - /var/log/containers/*-${data.kubernetes.pod.uid}.log  # Collect stdout/stderr logs
+                  multiline.pattern: '^\['  # Optional: if your logs are multiline (adjust if needed)
+                  multiline.negate: true
+                  multiline.match: after
+
+    setup.dashboards.enabled: true
+    setup.kibana:
+      host: "{{ .Values.kibanaService }}"  # Kibana service (use internal service name)
+    output.elasticsearch:
+      hosts: [ "{{ .Values.esService }}" ]  # Send logs to Elasticsearch service
+
