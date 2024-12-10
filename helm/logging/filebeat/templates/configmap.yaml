@@ -13,19 +13,19 @@ data:
           templates:
             - condition:
                 equals: 
-                  kubernetes.namespace: {{ .Values.appNamespace }}
+                  kubernetes.namespace: {{ .Values.appNamespace }}  # App namespace (e.g., default)
               config:
-                - module: nginx
-                  access.input:
-                      type: docker
-                      containers.ids:
-                      - "${data.kubernetes.container.id}"
-                      paths:
-                        - /var/log/containers/*${data.kubernetes.container.id}.log
+                - type: container
+                  paths:
+                    - /var/log/containers/*-${data.kubernetes.pod.uid}.log  # Collect stdout/stderr logs
+                  multiline.pattern: '^\['  # Optional: if your logs are multiline (adjust if needed)
+                  multiline.negate: true
+                  multiline.match: after
 
     setup.dashboards.enabled: true
     setup.kibana:
-      host: {{ .Values.kibanaService }}            
+      host: {{ .Values.kibanaService }}  # Kibana service (use correct service name in values.yaml)
     output.elasticsearch:
-      hosts: [{{ .Values.esService}}]
+      hosts: [{{ .Values.esService }}]  # Elasticsearch service (use correct service name in values.yaml)
+
 
