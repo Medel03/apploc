@@ -1,0 +1,73 @@
+# Namespace where Filebeat, Elasticsearch, and Kibana are running
+namespace: logging
+
+# App name (used in RBAC, ServiceAccount, and labels)
+appName: filebeat
+
+# Elasticsearch host and port configuration (internal service name for Filebeat to connect to)
+esService: "elasticsearch:9200"  # Internal service name for Elasticsearch
+
+# Kibana host and port for Filebeat to set up dashboards (use internal service name)
+kibanaService: "kibana:5601"  # Internal service name for Kibana (within the same cluster)
+
+# Filebeat image settings
+image:
+  repository: docker.elastic.co/beats/filebeat
+  tag: "8.10.0"  # Change this to the Filebeat version you want to use
+
+# RBAC settings
+serviceAccount:
+  create: true
+  name: "filebeat-serviceaccount"  # Name of the ServiceAccount for Filebeat
+
+# ConfigMap containing filebeat.yml settings
+config:
+  filebeat.yml: |
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          templates:
+            - condition:
+                equals:
+                  kubernetes.namespace: logging  # Update this if using different namespace
+              config:
+                - module: nginx
+                  access.input:
+                      type: docker
+                      containers.ids:
+                      - "${data.kubernetes.container.id}"
+                      paths:
+                        - /var/log/containers/*${data.kubernetes.container.id}.log
+
+    setup.dashboards.enabled: true
+    setup.kibana:
+      host: "http://{{ .Values.kibanaService }}"  # Connect to Kibana using internal service name
+    output.elasticsearch:
+      hosts: [ "{{ .Values.esService }}" ]  # Send logs to Elasticsearch service
+
+# DaemonSet settings to deploy Filebeat across all nodes
+daemonset:
+  enabled: true
+  replicas: 1  # Set number of replicas to 1 since it’s a DaemonSet
+  updateStrategy: RollingUpdate
+  podManagementPolicy: OrderedReady
+
+  # CPU/Memory limits and requests
+  resources:
+    limits:
+      memory: "2Gi"
+      cpu: "500m"
+    requests:
+      memory: "1Gi"
+      cpu: "200m"
+
+# Enable persistence for data (logs are stored on the host system)
+persistence:
+  enabled: true
+  path: "/var/lib/filebeat-data"
+  storageClass: "standard"  # Adjust this based on your cluster's storage class
+
+# Service Account configuration (if needed)
+serviceAccount:
+  create: true
+  name: "filebeat"  # Filebeat ServiceAccount
