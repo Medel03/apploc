@@ -1,7 +1,0 @@
-apiVersion: v2
-name: filebeat
-description: A Helm chart for Filebeat in Kubernetes
-type: application
-version: 0.1.0
-appVersion: "7.10.0"
-
